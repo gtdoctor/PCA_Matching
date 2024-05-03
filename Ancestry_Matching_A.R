@@ -1,7 +1,6 @@
 # Ancestry matching algorithm first developedby AP Levine.
 # updated 2024 by GT Doctor
 
-rm(list=ls())
 
 library(ggplot2)
 library(parallel)
