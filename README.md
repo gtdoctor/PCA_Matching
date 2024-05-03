@@ -64,4 +64,5 @@ Using 40 cores on a linux server, on UK Biobank scale data, part A takes approx 
 
 ## Developers
 Ancestry matching algorithm first developedby AP Levine. https://github.com/APLevine
-Updated 2024 by GT Doctor UCL Centre for Genetics and Genomics ttps://github.com/gtdoctor
+
+Updated 2024 by GT Doctor UCL Centre for Genetics and Genomics https://github.com/gtdoctor
