@@ -29,7 +29,7 @@ euclidean <- "y" # default manhattan. apply "y" to calculate unweighted euclidea
 eigvalweight <- "y" # should distances be weighted by the eigvalue of the PC.
 nchunks = 40 # number of case chunks for parallel processing.
 
-PCmax=10 # if graphing is to be done, can only take value >=8 at the moment. 
+PCmax=10 
 
   
 ######### CODE ############
