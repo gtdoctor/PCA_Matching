@@ -55,8 +55,13 @@ The case with the furthest near-neighbour is assigned that control. And so on.
 "nc" - number of controls sought per case (i.e max number of controls to be matched.
 "ncmin" - minimum acceptable number of controls - cases excluded if this cannot be met. 
 
+
 ## COMMENTS
 There are no default settings as such and results are sensitive to the method chosen, especially weighting and the number of controls sought.   
 I recommend using Euclidean weighted distances with 10 PCs (based on some empirical testing of data from 1000 Genomes Project and UKB). 
 In UKB, seeking 7 cases with threshold distance of 0.2 of median distance seems optimal. 
 Using 40 cores on a linux server, on UK Biobank scale data, part A takes approx 10 minutes. Part B quicker. 
+
+## Developers
+Ancestry matching algorithm first developedby AP Levine. https://github.com/APLevine
+Updated 2024 by GT Doctor UCL Centre for Genetics and Genomics ttps://github.com/gtdoctor
