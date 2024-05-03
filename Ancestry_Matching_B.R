@@ -1,5 +1,5 @@
 # Ancestry matching algorithm first developedby AP Levine.
-# updated 2024 by GT Doctor g.doctor@ucl.ac.uk UCL Centre for Genetics and Genomics
+# updated 2024 by GT Doctor 
 
 library(ggplot2)
 library(grid)
