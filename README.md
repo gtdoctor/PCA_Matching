@@ -1,6 +1,6 @@
 # PCA Ancestry matching algorithm 
 
-GOAL: to find up to "nc" unique controls within a certain "threshold" "distance" of each case, based on principal components of a genetic relationship matrix. 
+GOAL: to find up to "nc" unique controls within a certain "threshold" "distance" of each case, based on principal components of a standardised genotype matrix. 
 
 ## INPUTS: 
 Requires:
