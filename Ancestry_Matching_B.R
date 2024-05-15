@@ -39,7 +39,12 @@ ncmin= 7  # <=nc case excluded if fewer controls found.
 
 ######### CODE ############
 setwd(DATADIR)
-COHORT  <-  read.table(COHORT, header = T, comment.char = "")
+if (plinkversion == "v1.9") {
+  COHORT=read.table(PSAM, header=FALSE, col.names = c("FID", "IID", "F", "M", "Sex", "PHENO1"))
+}
+if (plinkversion =="v2"){
+  cohort=read.table(PSAM, header = T, comment.char = "")
+}
 PCA.eigenvec <- read.table(PCA.eigenvec, header=T, comment.char = "")
 
 setwd(OUTDIRP)
