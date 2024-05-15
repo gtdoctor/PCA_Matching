@@ -170,7 +170,7 @@ for (i in 1:nrow(cases_matrix)) {
   }
 
 
-    distancefunction = function(casechunk, nctrls, ctrls_index, controls_matrix, ) {
+    distancefunction = function(casechunk, nctrls, ctrls_index, controls_matrix) {
       # Initialize matrix to store results for this chunk with appropriate dimensions
       chunk_results = matrix(0, nrow(casechunk), nctrls)
       for (i in 1:nrow(casechunk)) {
