@@ -7,7 +7,7 @@ library(gridExtra)
 
 
 # loading the distmatrix #
-setwd("/home/gabriel/nasgab/INS/Dec2023/Merged/Ancestry_match16042024")
+setwd("path/to/pcaandpsam.files")
 shouldload <- "y" # if distance matrix should be loaded (if matrix part 1 run in seperate session)
 ### Loading matrices #####
 RWORKSPACE="pathto/distancematrix.Rdata" ### distance matrices, case cohort PC matrices
@@ -17,18 +17,18 @@ if (shouldload == "y") {load(file=RWORKSPACE)}
 ###### CHOICES #######
 
 # INPUTS #
-COHORT <-  "/mnt/nas1/projects/gabriel/INS/Dec2023/Merged/mergedmegaUkbforpca.23feb.psam"
+COHORT <-  "path/to/psamwithcasecontroldata.psam"
 PCA.eigenvec <- "casectrl_forPCA.eigenvec" # plink2 --PCA output, headed, with FID, IID, PCAs
 
 ## CHECK if the dataframes have ID as X.IID or IID - may need to change throughout. 
 plinkversion <- "v2"
 
 # OUTPUTS #
-FILEOUTSTEM="megains_ukb1602024" 
+FILEOUTSTEM="namestepforoutputfiles" 
 
 # PATHS # 
-DATADIR=file.path("/mnt/nas1/projects/gabriel/INS/Dec2023/Merged/")
-OUTDIRP=file.path("/mnt/nas1/projects/gabriel/INS/Dec2023/Merged/Ancestry_match16042024/") # output directory parent. No final slash 
+DATADIR=file.path("path/to/data/dir")
+OUTDIRP=file.path("path/to/dir/for/outputfiles") # output directory parent. No final slash 
 
 
 
