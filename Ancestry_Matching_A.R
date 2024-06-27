@@ -38,10 +38,9 @@ setwd(DATADIR)
 FILEOUTSTEM <- paste0(FILEOUTSTEM,"_",PCmax,"pcs")
 
 #Load PC data
-d=read.table(PCA.eigenvec,header=T, comment.char = "")
-if (plinkversion=="v1.9"){
-names(d)=c("FID","IID",paste("PC",1:10,sep=""))
-}
+d=read.table(PCA.eigenvec,header=F, comment.char = "") # read in without header to avoid problems if plink1.9 vs 2 is used. 
+names(d)=c("FID","IID",paste("PC",1:10,sep="")) # take care that these match and that first line of the file isn't removed. 
+
 
 #Load weightings
 ev = an(read.table(PCA.eigenval, header=F)[,1])
@@ -90,13 +89,10 @@ nctrls=nrow(controls_matrix)
 ccdistances <- matrix(nrow = ncases, ncol = nctrls)
 
 
-# Split cases_matrix into chunks for parallel
+# Create a sequence to split the data
 chunk_size = ceiling(ncases / nchunks)
-casechunks = lapply(1:nchunks, function(i) {
-  start_row = (i - 1) * chunk_size + 1
-  end_row = min(i * chunk_size, ncases)
-  cases_matrix[start_row:end_row, ]
-})
+split_seq <- rep(1:nchunks, each = chunk_size, length.out = ncases) # vector of assignments for each line of case data -- 1repeated chunksize times, 2 repeated chunksize times etc.
+casechunks <- split(case_matrix, split_seq)
 
 ## Distance calculations
 
