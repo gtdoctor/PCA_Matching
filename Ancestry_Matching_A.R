@@ -38,7 +38,7 @@ setwd(DATADIR)
 FILEOUTSTEM <- paste0(FILEOUTSTEM,"_",PCmax,"pcs")
 
 #Load PC data
-d=read.table(PCA.eigenvec,header=F, comment.char = "") # read in without header to avoid problems if plink1.9 vs 2 is used. 
+d=read.table(PCA.eigenvec,header=F, comment.char = "#") # header to avoid problems if plink1.9 vs 2 is used. 
 names(d)=c("FID","IID",paste("PC",1:10,sep="")) # take care that these match and that first line of the file isn't removed. 
 
 
@@ -48,16 +48,10 @@ ev.weight = ev/sum(ev) # weighting as proportion of top 10 eigenvals
 
 
 # read case control. check here that the correct columns (e.g. XIID, PC1-10 are being selected)
-if (plinkversion == "v1.9") {
-cohort=read.table(PSAM, header=F)
+cohort=read.table(PSAM, header=F,comment.char = "#", )
 cases <- d[d$IID %in% cohort$V2[cohort$V6 == 2],2:12]
-controls  <- d[d$IID %in% cohort$V2[cohort$V6 == 1],2:12]
-}
-if (plinkversion =="v2"){
-cohort=read.table(PSAM, header = T, comment.char = "", sep = "\t")
-cases <- d[d$IID %in% cohort$IID[cohort$PHENO1 == 2],2:12] # check column names
-controls <- d[d$IID %in% cohort$IID[cohort$PHENO1 == 1],2:12]
-}
+controls  <- d[d$IID %in% cohort$V2[cohort$V6 == 1],2:12]  # check that case control assignment is in col6 and IID in col 2
+
 
 # small sample
 if (smallsample == "y") {
@@ -94,6 +88,11 @@ chunk_size = ceiling(ncases / nchunks)
 split_seq <- rep(1:nchunks, each = chunk_size, length.out = ncases) # vector of assignments for each line of case data -- 1repeated chunksize times, 2 repeated chunksize times etc.
 casechunks <- split(case_matrix, split_seq)
 
+# Restructure each vector back into a matrix
+casechunks <- lapply(casechunks, function(chunk) {
+  matrix(chunk, ncol = ncol(cases_matrix), byrow = FALSE)
+})
+
 ## Distance calculations
 
 # Compute weighted Manhattan distances
@@ -105,7 +104,7 @@ if (eigvalweight == "y") {
 
   print("Computing weighted Manhattan distances")
 
-  distancefunction = function(casechunk, nctrls, ctrls_index, controls_matrix, ev.weight) {
+  distancefunction = function(casechunk, nctrls, controls_matrix, ev.weight) {
     # Initialize matrix to store results for this chunk with appropriate dimensions
     chunk_results = matrix(0, nrow(casechunk), nctrls)
     
@@ -129,7 +128,7 @@ if (eigvalweight=="n"){
 print("Computing absolute differences")
 
 
-distancefunction = function(casechunk, nctrls, ctrls_index, controls_matrix) {
+distancefunction = function(casechunk, nctrls, controls_matrix) {
   # Initialize matrix to store results for this chunk with appropriate dimensions
   chunk_results = matrix(0, nrow(casechunk), nctrls)
   
@@ -166,7 +165,7 @@ for (i in 1:nrow(cases_matrix)) {
   }
 
 
-    distancefunction = function(casechunk, nctrls, ctrls_index, controls_matrix) {
+    distancefunction = function(casechunk, nctrls, controls_matrix) {
       # Initialize matrix to store results for this chunk with appropriate dimensions
       chunk_results = matrix(0, nrow(casechunk), nctrls)
       for (i in 1:nrow(casechunk)) {
@@ -189,7 +188,7 @@ if (eigvalweight =="y") {
   filesave=paste0(FILEOUTSTEM,"_eucwtd.Rdata")
   ev.weight = ev.weight[1:PCmax]
   
-    distancefunction = function(casechunk, nctrls, ctrls_index, controls_matrix,ev.weight) {
+    distancefunction = function(casechunk, nctrls, controls_matrix,ev.weight) {
     # Initialize matrix to store results for this chunk with appropriate dimensions
     chunk_results = matrix(0, nrow(casechunk), nctrls)
     for (i in 1:nrow(casechunk)) {
