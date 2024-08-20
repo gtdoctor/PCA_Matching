@@ -17,7 +17,7 @@ if (shouldload == "y") {load(file=RWORKSPACE)}
 ###### CHOICES #######
 
 # INPUTS #
-COHORT <-  "path/to/psamwithcasecontroldata.psam"
+PSAM <-  "path/to/psamwithcasecontroldata.psam"
 PCA.eigenvec <- "casectrl_forPCA.eigenvec" # plink2 --PCA output, headed, with FID, IID, PCAs
 
 ## CHECK if the dataframes have ID as X.IID or IID - may need to change throughout. 
@@ -39,13 +39,11 @@ ncmin= 7  # <=nc case excluded if fewer controls found.
 
 ######### CODE ############
 setwd(DATADIR)
-if (plinkversion == "v1.9") {
-  COHORT=read.table(PSAM, header=FALSE, col.names = c("FID", "IID", "F", "M", "Sex", "PHENO1"))
-}
-if (plinkversion =="v2"){
-  cohort=read.table(PSAM, header = T, comment.char = "")
-}
-PCA.eigenvec <- read.table(PCA.eigenvec, header=T, comment.char = "")
+    
+    cohort=read.table(PSAM, header=F, comment.char = "#", col.names = c("FID", "IID", "F", "M", "Sex", "PHENO1"))
+    d <- read.table(PCA.eigenvec, header=F, comment.char = "#", col.names = c("FID", "IID", paste0("PC",1:10)))
+    
+    
 
 setwd(OUTDIRP)
     
@@ -68,18 +66,12 @@ an = function(x){as.numeric(ac(x))}
 median_distance <- median(ccdistances, na.rm = TRUE)
 threshold=threshcutoff * median_distance
 
-# create matrix of ids
-if (plinkversion=="1.9") {
-case_ids <- cases$IID  # Assuming the case IDs are stored in 'IID' column of 'cases_use'
-control_ids <- controls$IID
-}
-if (plinkversion=="v2") {
-  case_ids <- COHORT$IID[COHORT$PHENO1==2]  # Assuming the case IDs are stored in 'IID' column of 'cases_use'
-  control_ids <- COHORT$IID[COHORT$PHENO1==1]  # Assuming the case IDs are stored in 'IID' column of 'cases_use'
-}
+    case_ids <- cohort$IID[cohort$PHENO1==2]  # Assuming the case IDs are stored in 'IID' column of 'cases_use'
+    control_ids <- cohort$IID[cohort$PHENO1==1]  # Assuming the case IDs are stored in 'IID' column of 'cases_use'
+    
 
-cases <- PCA.eigenvec[PCA.eigenvec$IID %in% case_ids,]
-controls <- PCA.eigenvec[PCA.eigenvec$IID %in% control_ids,]
+    cases <- d[d$IID %in% case_ids,]
+    controls <- d[d$IID %in% control_ids,]
   
 # Create a list with empty character vectors named by index i
 
@@ -150,14 +142,14 @@ repeat {
   if (length(index_largest_d) == 0) {
     break # Exit the loop if all cases have nc matches or no controls are available
   }
+      j_value <- an(shortest_distances[index_largest_d, 2])
   
   #add the largest_d to the matched_casecontrol list and increment the count for that case
   matched_casescontrols[[index_largest_d]] <- c(matched_casescontrols[[index_largest_d]], 
-                                                an(shortest_distances[index_largest_d, 2]))
+                                                    j_value)
   shortest_distances[index_largest_d, 3] <- shortest_distances[index_largest_d, 3] + 1
   
   # identify the control used in prev step, and all the cases matched to it. 
-  j_value <- shortest_distances[index_largest_d, 2]
   replace_i <- which(shortest_distances[, 2 ] == j_value )
   
   # add NA to the cases and matched controls that are to be replaced. These will remain NA if no further match.
@@ -177,7 +169,7 @@ repeat {
     has_non_na <- numeric()
     j.rmNA=numeric() 
     
-    # Identify rows in replace_i with any non-NA value
+  # Identify rows in replace_i with any non-NA value; has_non_na is a logical vector of replca
     has_non_na <- apply(!is.na(wdt[replace_i, , drop = FALSE]), 1, any)
     
     # Check if there are any rows with non-NA values
@@ -225,7 +217,7 @@ outputtable1=cbind(ac(c(cases_kept, controls_kept)))
 outputtable2=cbind(ac(c(cases_removed, controls_removed)))
 
 
-
+    if (do_plot == "y"){
 ## plotting
 mycols_before <- c('Controls' = "blue",
                     'Cases' = "red")
@@ -337,10 +329,10 @@ g4c <-ggplot() +
   scale_color_manual(values = mycols_before) +
   labs(x = "PC1", y = "PC5", color = "Group") +
   coord_fixed()
-
+    }
 #### RESULTS #####
 current_date <- Sys.Date()
-filename_append = paste0("_threshold", threshcutoff, "_maxmatches", nc, "_", current_date)
+    filename_append = paste0("threshold", threshcutoff, "_minmatches", ncmin,"_maxmatches", nc, "_", current_date)
 fileoutkept=paste0(fileoutkept, filename_append, ".txt")
 exp_out = paste0("samplesbypop", filename_append,".txt")
 fileoutremoved=paste0(fileoutremoved, filename_append, ".txt")
@@ -364,15 +356,20 @@ after2 = arrangeGrob(g1c, g2c, g3c, g4c, nrow = 2 )
 outdir=paste0(OUTDIRP,"/", FILEOUTSTEM, "_",filename_append)
 dir.create(outdir, recursive = F)
 setwd(outdir)
+    
+    write(paste0("# Ancestry Matching: ", text_choice, "\n", text_results), file = fileoutkept )
+    write.table(outputtable1,file=fileoutkept, quote=F,row.names=F,col.names=F,sep="\t", append = TRUE)
+    write.table(outputtable2,file=fileoutremoved,quote=F,row.names=F,col.names=F,sep="\t", append = TRUE)
+    
+    if (do_plot=="y"){
+      before= arrangeGrob(g1a, g2a, g3a, g4a, nrow = 2)
+      after = arrangeGrob(g1b, g2b, g3b, g4b, nrow = 2 )
+      after2 = arrangeGrob(g1c, g2c, g3c, g4c, nrow = 2 )
+      
 ggsave(GRAPHPRE, plot = before,device = "jpeg", path = outdir,  width = 20, height = 16, dpi = 300)
 ggsave(GRAPHSPLIT,
         grid.arrange(after,top= textGrob(paste0(text_choice, " ", text_results),
                                         gp = gpar(fontsize = 10, font =2))),
         device = "jpeg", path = outdir, width = 20, height = 16, dpi = 300)
 ggsave(GRAPHKEPT, plot = after2 ,device = "jpeg", path = outdir,  width = 20, height = 16, dpi = 300)
-
-write(paste0("# Ancestry Matching: ", text_choice, "\n", text_results), file = fileoutkept )
-write.table(outputtable1,file=fileoutkept, quote=F,row.names=F,col.names=F,sep="\t", append = TRUE)
-write.table(outputtable2,file=fileoutremoved,quote=F,row.names=F,col.names=F,sep="\t", append = TRUE)
-
-
+    }
