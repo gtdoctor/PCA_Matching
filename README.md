@@ -1,4 +1,4 @@
-# PCA Ancestry matching algorithm 
+# PCA Genomic Similarity Matching
 
 GOAL: to find up to "nc" unique controls within a certain "threshold" "distance" of each case, based on principal components of a standardised genotype matrix. 
 
