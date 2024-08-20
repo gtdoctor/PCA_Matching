@@ -55,7 +55,7 @@ controls  <- d[d$IID %in% cohort$V2[cohort$V6 == 1],2:12]  # check that case con
 
 # small sample
 if (smallsample == "y") {
-  cases= cases[1:50,]
+  cases= cases[1:200,]
   controls=controls[1:2000,]
   controlnames=c(paste0("C",1:nrow(controls)))
   controls$IID=controlnames
@@ -86,7 +86,7 @@ ccdistances <- matrix(nrow = ncases, ncol = nctrls)
 # Create a sequence to split the data
 chunk_size = ceiling(ncases / nchunks)
 split_seq <- rep(1:nchunks, each = chunk_size, length.out = ncases) # vector of assignments for each line of case data -- 1repeated chunksize times, 2 repeated chunksize times etc.
-casechunks <- split(case_matrix, split_seq)
+casechunks <- split(cases_matrix, split_seq)
 
 # Restructure each vector back into a matrix
 casechunks <- lapply(casechunks, function(chunk) {
