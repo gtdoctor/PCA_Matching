@@ -145,33 +145,21 @@ results = mclapply(casechunks, distancefunction, nctrls = nctrls, controls_matri
 ccdistances = do.call(rbind, results)
 
 
-} # End man weighted
+} # End man unweighted
 } # end euclidean == "n"
 
 if (euclidean == "y") {  
-
 if (eigvalweight == "n") {
   print("Computing unweighted Euclidean distances")
     filesave=paste0(FILEOUTSTEM,"_eucunwtd.Rdata")
     
-
-for (i in 1:nrow(cases_matrix)) {
-  for (j in 1:nrow(controls_matrix)) {
-    # Calculate squared difference for all PCs between case i and control j
-    squared_distances <- (cases_matrix[i, ] - controls_matrix[j, ])^2
-    # Sum and take the square root to get weighted Euclidean distance
-    ccdistances[i, j] <- sqrt(sum(squared_distances))
-  }
-  }
-
-
     distancefunction = function(casechunk, nctrls, controls_matrix) {
       # Initialize matrix to store results for this chunk with appropriate dimensions
       chunk_results = matrix(0, nrow(casechunk), nctrls)
       for (i in 1:nrow(casechunk)) {
         for (j in 1:nctrls) {
           # Calculate squared difference for all PCs between case i and control j
-          squared_distances <- (casechunk[i, ] - controls_matrix[j, ])^2 # squared_distances is a vector as is ev weight; multiples matching elements
+          squared_distances <- (casechunk[i, ] - controls_matrix[j, ])^2 
           # Sum and take the square root to get weighted Euclidean distance
           chunk_results[i, j] <- sqrt(sum(squared_distances))
         }
