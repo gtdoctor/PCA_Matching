@@ -52,7 +52,7 @@ Creates a matrix of distances between each case and all controls.
 ### Further details of matching: 
 * Ignoring all distances greater than the threshold, for each case the nearest-neighour control is identified
 * The case with the furthest near-neighbour is assigned that control. 
-* The control is then removed; then that case and any case assigned to the same control, have their next nearest neighbour identified.
+* That case and any case assigned to the same control, have their next nearest neighbour identified.
 * The case with the furthest near-neighbour is assigned that control. And so on. 
 
 
